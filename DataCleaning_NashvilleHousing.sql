@@ -157,5 +157,7 @@ SELECT *,
 FROM PortfolioProject..NashvilleHousing
 --ORDER BY ParcelID
 )
-SELECT *
+select * 
 FROM RowNumCTE
+WHERE row_num = 1
+--ORDER BY PropertyAddress
