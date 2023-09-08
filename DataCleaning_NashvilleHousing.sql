@@ -26,7 +26,7 @@ FROM NashvilleHousing
 WHERE PropertyAddress is null
 ORDER BY ParcelID
 
-SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress,b.PropertyAddress)
+SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress,ISNULL(a.PropertyAddress,b.PropertyAddress)
 FROM NashvilleHousing a
 JOIN NashvilleHousing b
 	ON a.ParcelID = b.ParcelID
@@ -157,7 +157,22 @@ SELECT *,
 FROM PortfolioProject..NashvilleHousing
 --ORDER BY ParcelID
 )
-select * 
+DELETE 
 FROM RowNumCTE
-WHERE row_num = 1
+WHERE row_num > 1
 --ORDER BY PropertyAddress
+
+
+-- DELETE UNUSED COLUMNS
+
+
+SELECT *
+FROM PortfolioProject..NashvilleHousing  
+
+ALTER TABLE PortfolioProject..NashvilleHousing 
+DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress
+
+ALTER TABLE PortfolioProject..NashvilleHousing 
+DROP COLUMN SaleDate
+
+
