@@ -112,13 +112,19 @@ WHERE Res.statusId > 1
 --GROUP BY DrvSt.raceID, DrvSt.DriverID, DrvSt.DriverName, DrvSt.nationality, DrvSt.CircuitFName, DrvSt.Position, DrvSt.RaceDate,  DrvsT.RaceStatus, Res.statusId, status.status
 ORDER BY 7,1
 
-SELECT *
-FROM DriverStatistics
-ORDER BY 7,1
+
+
+-- What were the results of the Qatar race
+
+SELECT Cir.circuitId, Cir.location, Cir.country, Cir.location, races.year, drivers.driverId, drivers.forename, drivers.surname, results.points, results.position, RACES.date
+FROM FormulaOneData..circuits Cir, FormulaOneData..races, FormulaOneData..results, FormulaOneData..drivers
+where country = 'Qatar' AND Cir.circuitId = races.circuitId AND races.year <2023 AND results.raceId = races.raceId AND results.driverId = drivers.driverId
+ORDER BY 9 DESC
+
+CREATE VIEW qatar_race_results AS
+SELECT Cir.circuitId, Cir.location, Cir.country, races.year, drivers.driverId, drivers.forename, drivers.surname, results.points, results.position, RACES.date
+FROM FormulaOneData..circuits Cir, FormulaOneData..races, FormulaOneData..results, FormulaOneData..drivers
+where country = 'Qatar' AND Cir.circuitId = races.circuitId AND races.year <2023 AND results.raceId = races.raceId AND results.driverId = drivers.driverId
 
 SELECT *
-FROM FormulaOneData..results
-ORDER BY 2,3
-
-SELECT *
-FROM FormulaOneData..status
+FROM qatar_race_results
