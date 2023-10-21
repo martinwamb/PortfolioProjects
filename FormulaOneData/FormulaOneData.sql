@@ -121,10 +121,42 @@ FROM FormulaOneData..circuits Cir, FormulaOneData..races, FormulaOneData..result
 where country = 'Qatar' AND Cir.circuitId = races.circuitId AND races.year <2023 AND results.raceId = races.raceId AND results.driverId = drivers.driverId
 ORDER BY 9 DESC
 
+
+IF OBJECT_ID('qatar_race_results', 'V') IS NOT NULL
+DROP VIEW qatar_race_results;
+GO
+
 CREATE VIEW qatar_race_results AS
-SELECT Cir.circuitId, Cir.location, Cir.country, races.year, drivers.driverId, drivers.forename, drivers.surname, results.points, results.position, RACES.date
+SELECT Cir.circuitId, Cir.location, Cir.country, races.year, drivers.driverId, drivers.forename, drivers.surname, results.points, results.position, DATENAME(YEAR,RACES.date) Year_
 FROM FormulaOneData..circuits Cir, FormulaOneData..races, FormulaOneData..results, FormulaOneData..drivers
-where country = 'Qatar' AND Cir.circuitId = races.circuitId AND races.year <2023 AND results.raceId = races.raceId AND results.driverId = drivers.driverId
+where country = 'Qatar' AND Cir.circuitId = races.circuitId AND races.year <2023 AND results.raceId = races.raceId AND results.driverId = drivers.driverId;
+
 
 SELECT *
 FROM qatar_race_results
+
+
+--- What were the results of the Circuit of the Americas
+SELECT *
+FROM FormulaOneData..circuits order by 5
+--where country = 'United'
+-- Circuit ID is 69
+
+SELECT *
+FROM FormulaOneData..races
+WHERE circuitId = 69
+ORDER BY 2 -- Number of races so far have been 10 and raceIDs have been 878,898,916,942,965,985,1006,1028,1069,1093
+
+-- Which driver has had the most race wins in the Circuit of the Americas?
+CREATE VIEW CircuitOfTheAmericas AS
+SELECT year, name, drivers.driverId, drivers.surname, points, position, status.status, CONVERT(TIME,fastestLapTime) AS FastestLapTime
+FROM FormulaOneData..races 
+JOIN FormulaOneData..results
+ON races.raceId = results.raceId 
+JOIN FormulaOneData..drivers
+ON drivers.driverId = results.driverId 
+JOIN FormulaOneData..status
+ON status.statusId = results.statusId
+WHERE circuitId = 69
+--ORDER BY 1
+
