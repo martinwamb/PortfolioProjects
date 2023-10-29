@@ -1,9 +1,4 @@
-  SELECT *
-  FROM races
-
-  select *
-  FROM circuits
-  
+-- FORMULA 1 Data Analysis Project
   
   -- Determine which circuit had the fastest Quali time
   SELECT races.year, circuits.country, MIN(races.quali_time) FastestQuali
@@ -143,13 +138,17 @@ FROM FormulaOneData..circuits order by 5
 -- Circuit ID is 69
 
 SELECT *
-FROM FormulaOneData..races
+FROM FormulaOneData..drivers
 WHERE circuitId = 69
 ORDER BY 2 -- Number of races so far have been 10 and raceIDs have been 878,898,916,942,965,985,1006,1028,1069,1093
 
 -- Which driver has had the most race wins in the Circuit of the Americas?
+IF OBJECT_ID('CircuitOfTheAmericas', 'V') IS NOT NULL
+DROP VIEW CircuitOfTheAmericas;
+GO
+
 CREATE VIEW CircuitOfTheAmericas AS
-SELECT year, name, drivers.driverId, drivers.surname, points, position, status.status, CONVERT(TIME,fastestLapTime) AS FastestLapTime
+SELECT year, name, drivers.driverId, drivers.driverRef, points, position, status.status, CONVERT(TIME,fastestLapTime) AS FastestLapTime
 FROM FormulaOneData..races 
 JOIN FormulaOneData..results
 ON races.raceId = results.raceId 
@@ -158,5 +157,41 @@ ON drivers.driverId = results.driverId
 JOIN FormulaOneData..status
 ON status.statusId = results.statusId
 WHERE circuitId = 69
---ORDER BY 1
+ORDER BY 8 
+
+--- What were the results of the Mexico
+SELECT *
+FROM FormulaOneData..circuits 
+where country = 'Mexico'
+order by 5
+
+-- Circuit ID is 32
+
+SELECT year, name, drivers.driverId, drivers.driverRef, points, position, status.status, CONVERT(TIME,fastestLapTime) AS FastestLapTime
+FROM FormulaOneData..races 
+JOIN FormulaOneData..results
+ON races.raceId = results.raceId 
+JOIN FormulaOneData..drivers
+ON drivers.driverId = results.driverId 
+JOIN FormulaOneData..status
+ON status.statusId = results.statusId
+WHERE circuitId = 32
+
+
+-- Which driver has had the most race wins in the Circuit of the Americas?
+IF OBJECT_ID('MexicanGrandPrix', 'V') IS NOT NULL
+DROP VIEW CircuitOfTheAmericas;
+GO
+
+CREATE VIEW MexicanGrandPrix AS
+SELECT year, name, drivers.driverId, drivers.driverRef, points, position, status.status, CONVERT(TIME,fastestLapTime) AS FastestLapTime
+FROM FormulaOneData..races 
+JOIN FormulaOneData..results
+ON races.raceId = results.raceId 
+JOIN FormulaOneData..drivers
+ON drivers.driverId = results.driverId 
+JOIN FormulaOneData..status
+ON status.statusId = results.statusId
+WHERE circuitId = 32
+
 
