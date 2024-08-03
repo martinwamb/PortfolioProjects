@@ -1,2 +1,2 @@
 # Portfolio Projects
-These are various projects that I have taken a keen interest in and done some cool visualizations on. 
+In my pursuit of telling stories of various worldly occurrences, I have analyzed different data. The items in this folder contain the code used to conclude my various publications on www.martinwambugu.com
