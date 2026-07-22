@@ -32,7 +32,7 @@ SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVE
 FROM PortfolioProject..CovidDeathsTable
 --WHERE location = 'Kenya'
 Group by location, population
-ORDER BY PercentPopulationIfection DESC
+ORDER BY PercentPopulationInfection DESC
 
 -- CREATE A TEMP_TABLE WITH THE RATIO OF INFECTION AGAINST POPULATION
 
@@ -45,11 +45,11 @@ location varchar(100)
 )
 
 INSERT INTO #temp_InfectionVsPopulation
-SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (NULLIF(CONVERT(float, population),0) * 100)) AS PercentPopulationIfection
+SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (NULLIF(CONVERT(float, population),0) * 100)) AS PercentPopulationInfection
 FROM PortfolioProject..CovidDeathsTable
 --WHERE location = 'Kenya'
 Group by location, population
-ORDER BY PercentPopulationIfection DESC
+ORDER BY PercentPopulationInfection DESC
 
 --COMPARE THE CONTINENT THAT EXPERIENCED THE HIGHEST INFECTION RATE AGAINST THEIR POPULATION
 
