@@ -41,11 +41,11 @@ CREATE TABLE #temp_InfectionVsPopulation (
 location varchar(100)
 , population bigint
 , HighestInfectionCount bigint
-, PercentPopulationInfection int
+, PercentPopulationInfection float
 )
 
 INSERT INTO #temp_InfectionVsPopulation
-SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (NULLIF(CONVERT(float, population),0) * 100)) AS PercentPopulationInfection
+SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (NULLIF(CONVERT(float, population),0)) * 100) AS PercentPopulationInfection
 FROM PortfolioProject..CovidDeathsTable
 --WHERE location = 'Kenya'
 Group by location, population
@@ -61,7 +61,7 @@ GROUP BY continent, PercentPopulationInfection
 
 -- Comparing Population infection, population death and population vaccination
 
-SELECT vac.location, vac.population, PercentPopulationInfection, (MAX(vac.total_vaccinations)/NULLIF(vac.population, 0)) as PercentPopulationVaccination, MAX(CAST(vac.total_deaths as int)) as TotalDeaths
+SELECT vac.location, vac.population, PercentPopulationInfection, (CONVERT(float, MAX(vac.total_vaccinations))/NULLIF(vac.population, 0)) as PercentPopulationVaccination, MAX(CAST(vac.total_deaths as int)) as TotalDeaths
 FROM PortfolioProject..CovidVaccinations Vac
 JOIN #temp_InfectionVsPopulation
 	ON Vac.location = #temp_InfectionVsPopulation.location
@@ -128,7 +128,7 @@ JOIN PortfolioProject..CovidVaccinations vac
 --where dea.continent is not null
 --Order by 2,3
 )
-SELECT *, (RollingPeopleVaccinated/NULLIF(Population, 0))*100
+SELECT *, (CONVERT(float, RollingPeopleVaccinated)/NULLIF(Population, 0))*100
 FROM PopvsVac
 
 --Creating View to Store Data for Later Visualizations 
