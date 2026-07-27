@@ -21,14 +21,14 @@ ORDER BY 1,2
 --Looking at Total Cases vs Population
 --Shows what percentage of population got covid
 
-SELECT location,date,  population, total_cases, ((CONVERT(float, total_cases)) / (CONVERT(float, population)) * 100) AS CasesVsPopulation
+SELECT location,date,  population, total_cases, ((CONVERT(float, total_cases)) / (NULLIF(CONVERT(float, population), 0)) * 100) AS CasesVsPopulation
 FROM PortfolioProject..CovidDeathsTable
 WHERE location = 'Kenya'
 ORDER BY 1,2 
 
 --Looking at Countries with highest infection rate compared to population
 
-SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (CONVERT(float, population)) * 100) AS PercentPopulationInfection
+SELECT location,  population, MAX(total_cases) as HighestInfectionCount, ((CONVERT(float, MAX(total_cases))) / (NULLIF(CONVERT(float, population), 0)) * 100) AS PercentPopulationInfection
 FROM PortfolioProject..CovidDeathsTable
 --WHERE location = 'Kenya'
 Group by location, population
@@ -61,7 +61,7 @@ GROUP BY continent, PercentPopulationInfection
 
 -- Comparing Population infection, population death and population vaccination
 
-SELECT vac.location, vac.population, PercentPopulationInfection, (MAX(vac.total_vaccinations)/vac.population) as PercentPopulationVaccination, MAX(CAST(vac.total_deaths as int)) as TotalDeaths
+SELECT vac.location, vac.population, PercentPopulationInfection, (MAX(vac.total_vaccinations)/NULLIF(vac.population, 0)) as PercentPopulationVaccination, MAX(CAST(vac.total_deaths as int)) as TotalDeaths
 FROM PortfolioProject..CovidVaccinations Vac
 JOIN #temp_InfectionVsPopulation
 	ON Vac.location = #temp_InfectionVsPopulation.location
@@ -128,7 +128,7 @@ JOIN PortfolioProject..CovidVaccinations vac
 --where dea.continent is not null
 --Order by 2,3
 )
-SELECT *, (RollingPeopleVaccinated/Population)*100
+SELECT *, (RollingPeopleVaccinated/NULLIF(Population, 0))*100
 FROM PopvsVac
 
 --Creating View to Store Data for Later Visualizations 
