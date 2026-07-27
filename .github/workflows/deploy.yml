@@ -1,0 +1,37 @@
+name: Deploy to Hetzner
+
+# This repo holds SQL scripts, notebooks and datasets -- there is no service to
+# build or restart. "Deploy" here means keeping the server-side working copy at
+# ~/apps/portfolioprojects in sync with main so the queries and data are
+# available on the box.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync working copy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/admin/apps/portfolioprojects
+
+            echo '--- Pulling latest ---'
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
+
+            echo "--- Synced to $(git rev-parse --short HEAD) ---"
