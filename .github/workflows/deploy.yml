@@ -1,4 +1,4 @@
-name: Deploy to Hetzner
+name: Deploy to home server
 
 # This repo holds SQL scripts, notebooks and datasets -- there is no service to
 # build or restart. "Deploy" here means keeping the server-side working copy at
@@ -16,22 +16,33 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Reach the server through the Cloudflare tunnel
+        run: |
+          curl -fsSL -o /tmp/cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i /tmp/cloudflared.deb > /dev/null
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf 'Host *\n  ProxyCommand cloudflared access ssh --hostname %%h\n  ServerAliveInterval 30\n' >> ~/.ssh/config
+
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Sync working copy on server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
-          script: |
-            set -e
-            cd /home/admin/apps/portfolioprojects
+        env:
+          SSH_HOST: ${{ secrets.HETZNER_HOST }}
+          SSH_USER: ${{ secrets.HETZNER_USER }}
+          SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+        run: |
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          cat > /tmp/deploy.sh <<'DEPLOY_SCRIPT'
+          set -e
+          cd /home/admin/apps/portfolioprojects
 
-            echo '--- Pulling latest ---'
-            git fetch origin
-            git reset --hard origin/main
-            git clean -fd
+          echo '--- Pulling latest ---'
+          git fetch origin
+          git reset --hard origin/main
+          git clean -fd
 
-            echo "--- Synced to $(git rev-parse --short HEAD) ---"
+          echo "--- Synced to $(git rev-parse --short HEAD) ---"
+          DEPLOY_SCRIPT
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new \
+            "$SSH_USER@$SSH_HOST" 'f=$(mktemp) && cat > "$f" && bash "$f" < /dev/null; rc=$?; rm -f "$f"; exit $rc' < /tmp/deploy.sh
